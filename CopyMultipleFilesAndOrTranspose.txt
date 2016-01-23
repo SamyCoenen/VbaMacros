@@ -12,7 +12,7 @@ Option Explicit
             Dim vFile As Variant
             Dim vFolderBackup As Variant
             Dim XT() As Variant
-            Dim fldr As FileDialog
+            'Dim fldr As FileDialog
             'Het eerste excel bestand
             Set wb = ActiveWorkbook
             '300 excel bestanden selecteren
@@ -27,33 +27,33 @@ Option Explicit
 'End With
 
            If IsArray(vFile) Then
-
+           
     'ingaven van de cel ranges
-          oRangeTarget = Application.InputBox("Geef de range voor het moederbestand, bv A1:B5", "Selectie", , , , , , Type:=2)
-          oRangeSelected = Application.InputBox("Geef de range voor de 300 bestanden, bv A1:B5", "Selectie", , , , , , Type:=2)
+         oRangeTarget = Application.InputBox("Geef de range voor het moederbestand, bv A1:B5", "Selectie", , , , , , Type:=2)
+       oRangeSelected = Application.InputBox("Geef de range voor de 300 bestanden, bv A1:B5", "Selectie", , , , , , Type:=2)
        'ingeven of de cel ranges gaande weg moeten veranderen
-          horizontaal = Application.InputBox("Geef in hoeveel er naar rechts moet worden verplaatst per bestand(geen = 0)", , , , , , , Type:=1)
-          verticaal = Application.InputBox("Geef in hoeveel er naar beneden moet worden verplaatst per bestand(geen = 0)", , , , , , , Type:=1)
+       horizontaal = Application.InputBox("Geef in hoeveel er naar rechts moet worden verplaatst per bestand(geen = 0)", , , , , , , Type:=1)
+       verticaal = Application.InputBox("Geef in hoeveel er naar beneden moet worden verplaatst per bestand(geen = 0)", , , , , , , Type:=1)
        'moet de data gedraaid worden
-          Transpose = Application.InputBox("Moet de data gedraaid worden, d.w.z. rijen worden kolommen en andersom (ja of nee)", "Selectie", , , , , , Type:=2)
-
-          Msg = "Deze bestanden zijn gekopieerd:" & vbNewLine
-          For I = LBound(vFile) To UBound(vFile)
-          Msg = Msg & vFile(I) & vbNewLine
-          Workbooks.Open vFile(I)
-          Set wb2 = ActiveWorkbook
-          'kopieren van werkblad1 naar werkblad2
-          If Transpose = "ja" Then
-            XT = wb.Worksheets("Blad1").Range(oRangeTarget).Value
-            wb2.Worksheets("Blad1").Range(oRangeSelected).Offset(verticaal * I, horizontaal * I).Value = Application.Transpose(XT)
-          Else
-          wb2.Worksheets("Blad1").Range(oRangeSelected).Offset(verticaal * I, horizontaal * I).Value = wb.Worksheets("Blad1").Range(oRangeTarget).Value
-          End If
-          ActiveWorkbook.Close (True)
-          Next I
-          MsgBox Msg
-          Else
-          MsgBox "Geen geselecteerde bestanden."
-          End If
-         If TypeName(vFile) = "Boolean" Then Exit Sub
+       Transpose = Application.InputBox("Moet de data gedraaid worden, d.w.z. rijen worden kolommen en andersom (ja of nee)", "Selectie", , , , , , Type:=2)
+       
+              Msg = "Deze bestanden zijn gekopieerd:" & vbNewLine
+              For I = LBound(vFile) To UBound(vFile)
+                Msg = Msg & vFile(I) & vbNewLine
+                Workbooks.Open vFile(I)
+                Set wb2 = ActiveWorkbook
+                'kopieren van werkblad1 naar werkblad2
+                If Transpose = "ja" Then
+                XT = wb.Worksheets("Blad1").Range(oRangeTarget).Offset(verticaal * (I - 1), horizontaal * (I - 1)).Value
+                wb2.Worksheets("Blad1").Range(oRangeSelected).Value = Application.Transpose(XT)
+                Else
+                wb2.Worksheets("Blad1").Range(oRangeSelected).Value = wb.Worksheets("Blad1").Range(oRangeTarget).Offset(verticaal * (I - 1), horizontaal * (I - 1)).Value
+                End If
+                ActiveWorkbook.Close (True)
+              Next I
+              MsgBox Msg
+             Else
+              MsgBox "Geen geselecteerde bestanden."
+            End If
+           If TypeName(vFile) = "Boolean" Then Exit Sub
         End Sub
