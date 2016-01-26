@@ -7,24 +7,20 @@ Option Explicit
             Dim verticaal As Integer
             Dim Msg As String
             Dim Transpose As String
+            Dim NewFile As String
             Dim oRangeSelected As String
             Dim oRangeTarget As String
             Dim vFile As Variant
             Dim vFolderBackup As Variant
             Dim XT() As Variant
+            Dim strDir As String
             'Dim fldr As FileDialog
             'Het eerste excel bestand
             Set wb = ActiveWorkbook
             '300 excel bestanden selecteren
+            strDir = "C:/excelbestanden"
                vFile = Application.GetOpenFilename(MultiSelect:=True)
-               'Backup folder selecteren
-               'vFolderBackup = Application.FileDialog(msoFileDialogFolderPicker)
-              ' Set fldr = Application.FileDialog(msoFileDialogFolderPicker)
-'With fldr
-  '  .Title = "Select a Folder"
-   ' .AllowMultiSelect = False
-   ' vFolderBackup = .SelectedItems(1)
-'End With
+               
 
            If IsArray(vFile) Then
            
@@ -38,10 +34,31 @@ Option Explicit
        Transpose = Application.InputBox("Moet de data gedraaid worden, d.w.z. rijen worden kolommen en andersom (ja of nee)", "Selectie", , , , , , Type:=2)
        
               Msg = "Deze bestanden zijn gekopieerd:" & vbNewLine
+ErrMsg:
+MsgBox ("De backup is niet gelukt, een volgende poging volgt."), , "backup faal"
               For I = LBound(vFile) To UBound(vFile)
                 Msg = Msg & vFile(I) & vbNewLine
+                
                 Workbooks.Open vFile(I)
+                
                 Set wb2 = ActiveWorkbook
+                'Een backup kopie opslaan
+                NewFile = wb.Worksheets("Blad1").Cells(I, 1).Value
+
+               On Error GoTo ErrMsg
+    
+     
+    If Dir(strDir, vbDirectory) = "" Then
+        MkDir strDir
+    End If
+    ChDir strDir
+                ActiveWorkbook.SaveAs Filename:=NewFile, _
+        FileFormat:=52, _
+        Password:="", _
+        WriteResPassword:="", _
+        ReadOnlyRecommended:=False, _
+        CreateBackup:=False
+        Msg = Msg & strDir & NewFile & vbNewLine
                 'kopieren van werkblad1 naar werkblad2
                 If Transpose = "ja" Then
                 XT = wb.Worksheets("Blad1").Range(oRangeTarget).Offset(verticaal * (I - 1), horizontaal * (I - 1)).Value
